@@ -27,12 +27,17 @@ class SamlController extends AbstractController
             throw new \RuntimeException($error->getMessage());
         }
 
-        $this->get('onelogin_auth')->login($session->get('_security.main.target_path'));
+        $session->set(SamlListener::AUTH_ID_SESSION_NAME, $idp);
+
+        $this->authRegistry->getIdpAuth($idp)->login($session->get('_security.main.target_path'));
     }
 
     public function metadataAction()
     {
-        $auth = $this->get('onelogin_auth');
+        /** @var SessionInterface $session */
+        $session = $this->container->get('session');
+
+        $auth = $this->authRegistry->getIdpAuth($session->get('auth_id'));
         $metadata = $auth->getSettings()->getSPMetadata();
 
         $response = new Response($metadata);
