@@ -2,6 +2,7 @@
 
 namespace Hslavich\OneloginSamlBundle\Security\Firewall;
 
+use Hslavich\OneloginSamlBundle\Attributes\AttributesMapper;
 use Hslavich\OneloginSamlBundle\Security\Authentication\Token\SamlToken;
 use Hslavich\OneloginSamlBundle\Security\Utils\OneLoginAuthRegistry;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +25,11 @@ class SamlListener extends AbstractAuthenticationListener
      */
     private $defaultIdpName;
 
+    /**
+     * @var AttributesMapper
+     */
+    private $attributesMapper;
+
     public function setAuthRegistry(OneLoginAuthRegistry $authRegistry)
     {
         $this->authRegistry = $authRegistry;
@@ -32,6 +38,11 @@ class SamlListener extends AbstractAuthenticationListener
     public function setDefaultIdpName(string $defaultIdpName)
     {
         $this->defaultIdpName = $defaultIdpName;
+    }
+
+    public function setAttributesMapper(AttributesMapper $attributesMapper)
+    {
+        $this->attributesMapper = $attributesMapper;
     }
 
     /**
@@ -61,6 +72,8 @@ class SamlListener extends AbstractAuthenticationListener
         } else {
             $attributes = $oneLoginAuth->getAttributes();
         }
+
+        $attributes = $this->attributesMapper->resolveAttributes($idpName, $attributes);
         $attributes['sessionIndex'] = $oneLoginAuth->getSessionIndex();
         $token = new SamlToken();
         $token->setAttributes($attributes);

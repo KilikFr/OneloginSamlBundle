@@ -2,6 +2,7 @@
 
 namespace Hslavich\OneloginSamlBundle\DependencyInjection;
 
+use Hslavich\OneloginSamlBundle\Attributes\AttributesMapper;
 use Hslavich\OneloginSamlBundle\DependencyInjection\Compiler\SpResolverCompilerPass;
 use Hslavich\OneloginSamlBundle\Security\Utils\OneLoginAuthRegistry;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -32,6 +33,7 @@ class HslavichOneloginSamlExtension extends Extension
         $container->setParameter('hslavich_onelogin_saml.settings', $config);
         $container->setParameter('hslavich_onelogin_saml.default_idp_name', $config['default_idp']);
         $this->loadIdentityProviders($config, $container);
+        $this->createAttributesMapperDefinition($config['idps'], $container);
     }
 
     private function loadIdentityProviders(array $config, ContainerBuilder $container)
@@ -59,6 +61,19 @@ class HslavichOneloginSamlExtension extends Extension
             $registryDef->addMethodCall('addIdpAuth', [$id, new Reference($idpServiceId)]);
             $this->createLogoutDefinition($container, $id, $idpServiceId);
         }
+    }
+
+    private function createAttributesMapperDefinition(array $idps, ContainerBuilder $container)
+    {
+        $idpAttributesMap = [];
+        foreach($idps as $id => $idpConfig) {
+            if (isset($idpConfig['attributesMap'])) {
+                $idpAttributesMap[$id] = $idpConfig['attributesMap'];
+            }
+        }
+
+        $def = $container->getDefinition(AttributesMapper::class);
+        $def->setArgument('$attributesMap', $idpAttributesMap);
     }
 
     private function createAuthDefinition(ContainerBuilder $container, $id, array $config, $defaultIdp)

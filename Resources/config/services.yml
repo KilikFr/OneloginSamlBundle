@@ -20,6 +20,8 @@ services:
 
     hslavich_onelogin_saml.saml_token_factory:
         class: Hslavich\OneloginSamlBundle\Security\Authentication\Token\SamlTokenFactory
+        arguments:
+            - "@Hslavich\\OneloginSamlBundle\\Attributes\\AttributesMapper"
 
     hslavich_onelogin_saml.saml_listener:
         class: Hslavich\OneloginSamlBundle\Security\Firewall\SamlListener
@@ -28,6 +30,7 @@ services:
         calls:
             - [ setAuthRegistry, ["@Hslavich\\OneloginSamlBundle\\Security\\Utils\\OneLoginAuthRegistry"] ]
             - [ setDefaultIdpName, ["%hslavich_onelogin_saml.default_idp_name%"] ]
+            - [ setAttributesMapper, ["@Hslavich\\OneloginSamlBundle\\Attributes\\AttributesMapper"] ]
 
     hslavich_onelogin_saml.saml_logout:
         class: Hslavich\OneloginSamlBundle\Security\Logout\SamlLogoutHandler
@@ -39,3 +42,5 @@ services:
             - "@Hslavich\\OneloginSamlBundle\\Security\\Utils\\OneLoginAuthRegistry"
         tags:
             - { name: controller.service_arguments }
+
+    Hslavich\OneloginSamlBundle\Attributes\AttributesMapper: ~

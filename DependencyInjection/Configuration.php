@@ -193,6 +193,9 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('attributesMap')
+                    ->prototype('scalar')->end()
+                ->end()
             ->end()
         ->end();
     }
