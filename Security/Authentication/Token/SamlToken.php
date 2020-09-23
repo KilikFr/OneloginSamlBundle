@@ -6,10 +6,7 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
 class SamlToken extends AbstractToken implements SamlTokenInterface
 {
-    /**
-     * @var string
-     */
-    protected $idpName;
+    const IDP_NAME_KEY = '_idp_name';
 
     public function getCredentials()
     {
@@ -18,7 +15,7 @@ class SamlToken extends AbstractToken implements SamlTokenInterface
 
     public function getIdpName()
     {
-        return $this->idpName;
+        return $this->getAttribute(self::IDP_NAME_KEY);
     }
 
     /**
@@ -26,6 +23,6 @@ class SamlToken extends AbstractToken implements SamlTokenInterface
      */
     public function setIdpName($idpName)
     {
-        $this->idpName = $idpName;
+        $this->setAttribute(self::IDP_NAME_KEY, $idpName);
     }
 }
