@@ -46,6 +46,7 @@ class SamlController extends AbstractController
         }
 
         $this->authRegistry->getIdpAuth($idp)->login($session->get('_security.main.target_path'));
+
     }
 
     public function metadataAction($idp = null)
