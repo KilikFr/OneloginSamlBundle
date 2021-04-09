@@ -43,11 +43,11 @@ class SamlLogoutHandler implements LogoutHandlerInterface
         }
 
         try {
-            $this->samlAuth->processSLO();
+            $auth->processSLO();
         } catch (\OneLogin\Saml2\Error $e) {
-            if (!empty($this->samlAuth->getSLOurl())) {
+            if (!empty($auth->getSLOurl())) {
                 $sessionIndex = $token->hasAttribute('sessionIndex') ? $token->getAttribute('sessionIndex') : null;
-                $this->samlAuth->logout(null, array(), $token->getUsername(), $sessionIndex);
+                $auth->logout(null, array(), $token->getUsername(), $sessionIndex);
             }
         }
     }
