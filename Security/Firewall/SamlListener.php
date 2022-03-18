@@ -38,17 +38,21 @@ class SamlListener extends AbstractAuthenticationListener
      * Performs authentication.
      *
      * @param Request $request A Request instance
+     *
      * @return TokenInterface|Response|null The authenticated token, null if full authentication is not possible, or a Response
      *
      * @throws AuthenticationException if the authentication fails
-     * @throws \Exception if attribute set by "username_attribute" option not found
+     * @throws \Exception              if attribute set by "username_attribute" option not found
      */
     protected function attemptAuthentication(Request $request)
     {
-        // Get current IdP name or use the single configured IdP
-        $idpName = $request->getSession()->get(self::IDP_NAME_SESSION_NAME, 'default');
+        $idpName = $request->query->get('idp', $this->defaultIdpName);
 
-        $oneLoginAuth = $this->authRegistry->getIdpAuth($idpName);
+        try {
+            $oneLoginAuth = $this->authRegistry->getIdpAuth($idpName);
+        } catch (\Exception $ex) {
+            throw new AuthenticationException($ex->getMessage());
+        }
 
         $oneLoginAuth->processResponse();
         if ($oneLoginAuth->getErrors()) {
@@ -68,7 +72,7 @@ class SamlListener extends AbstractAuthenticationListener
 
         if (isset($this->options['username_attribute'])) {
             if (!array_key_exists($this->options['username_attribute'], $attributes)) {
-                $this->logger->error(sprintf("Found attributes: %s", print_r($attributes, true)));
+                $this->logger->error('Found attributes are ', $attributes);
                 throw new \Exception(sprintf("Attribute '%s' not found in SAML data", $this->options['username_attribute']));
             }
 
