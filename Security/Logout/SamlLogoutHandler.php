@@ -4,6 +4,7 @@ namespace Hslavich\OneloginSamlBundle\Security\Logout;
 
 use Hslavich\OneloginSamlBundle\Security\Authentication\Token\SamlTokenInterface;
 use Hslavich\OneloginSamlBundle\Security\Utils\OneLoginAuthRegistry;
+use OneLogin\Saml2\Error;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -45,9 +46,13 @@ class SamlLogoutHandler implements LogoutHandlerInterface
         try {
             $auth->processSLO();
         } catch (\OneLogin\Saml2\Error $e) {
-            if (!empty($auth->getSLOurl())) {
+            try {
                 $sessionIndex = $token->hasAttribute('sessionIndex') ? $token->getAttribute('sessionIndex') : null;
-                $auth->logout(null, array(), $token->getUsername(), $sessionIndex);
+                $auth->logout(null, [], $token->getUsername(), $sessionIndex);
+            } catch (\OneLogin\Saml2\Error $e) {
+                if (Error::SAML_SINGLE_LOGOUT_NOT_SUPPORTED !== $e->getCode()) {
+                    throw $e;
+                }
             }
         }
     }
