@@ -41,5 +41,7 @@ services:
     Hslavich\OneloginSamlBundle\Controller\SamlController:
         arguments:
             - "@Hslavich\\OneloginSamlBundle\\Security\\Utils\\OneLoginAuthRegistry"
+        calls:
+            - [ setContainer, [ '@service_container' ] ]
         tags:
             - { name: controller.service_arguments }
