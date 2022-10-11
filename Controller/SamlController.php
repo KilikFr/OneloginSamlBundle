@@ -2,6 +2,7 @@
 
 namespace Hslavich\OneloginSamlBundle\Controller;
 
+use Hslavich\OneloginSamlBundle\Exception\UndefinedIdpException;
 use Hslavich\OneloginSamlBundle\Security\Firewall\SamlListener;
 use Hslavich\OneloginSamlBundle\Security\Utils\OneLoginAuthRegistry;
 use InvalidArgumentException;
@@ -45,8 +46,11 @@ class SamlController extends AbstractController
             $session->set(SamlListener::IDP_NAME_SESSION_NAME, $idp);
         }
 
-        $this->authRegistry->getIdpAuth($idp)->login($session->get('_security.main.target_path'));
-
+        try {
+            $this->authRegistry->getIdpAuth($idp)->login($session->get('_security.main.target_path'));
+        } catch (UndefinedIdpException $exception) {
+            throw $this->createNotFoundException($exception->getMessage());
+        }
     }
 
     public function metadataAction($idp = null)

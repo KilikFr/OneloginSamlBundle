@@ -2,6 +2,7 @@
 
 namespace Hslavich\OneloginSamlBundle\Security\Utils;
 
+use Hslavich\OneloginSamlBundle\Exception\UndefinedIdpException;
 use OneLogin\Saml2\Auth;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -49,7 +50,7 @@ class OneLoginAuthRegistry
         }
 
         if (!isset($this->idpAuth[$name])) {
-            throw new \InvalidArgumentException(sprintf('Undefined IDP "%s"', $name));
+            throw new UndefinedIdpException(sprintf('Undefined IDP "%s"', $name));
         }
 
         return $this->idpAuth[$name];
